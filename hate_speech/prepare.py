@@ -7,6 +7,8 @@ from utils.embed import embed_text
 def prepare_dataframe() -> pd.DataFrame:
     """
     Read data from csv file and prepare a dataframe with
+        Before running, make sure that data is correctly placed
+        in the data folder as `hate_speech/data/hsol.csv`
     :return: dataframe with adjusted columns and labels
     """
     df = pd.read_csv('hate_speech/data/hsol.csv')
