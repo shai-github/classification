@@ -51,7 +51,7 @@ def handle_urls(text: str) -> str:
     return text.strip()
 
 
-def clean_text(text):
+def clean_text(text: str) -> str:
     """
     Clean text by removing URLs, HTML tags, line breaks, tabs,  and extra whitespace
     :param text: a piece of raw input text
