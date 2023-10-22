@@ -20,7 +20,7 @@ def average_pool(last_hidden_states: Tensor, attention_mask: Tensor) -> Tensor:
     return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
 
 
-def embed(input_texts: list[str]) -> Tensor:
+def embed_text(input_texts: list[str]) -> Tensor:
     """
     Generate batched embeddings from input texts using the pretrained model
     :param input_texts: list of input texts
