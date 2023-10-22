@@ -4,7 +4,7 @@ from torch import Tensor
 from transformers import AutoTokenizer, AutoModel
 
 
-PRETRAINED_MODEL = 'intfloat/e5-large-v2'
+PRETRAINED_MODEL = 'intfloat/e5-small-v2'
 TOKENIZER = AutoTokenizer.from_pretrained(PRETRAINED_MODEL)
 MODEL = AutoModel.from_pretrained(PRETRAINED_MODEL)
 
