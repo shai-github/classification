@@ -1,4 +1,5 @@
 import re
+import html
 import unicodedata
 
 
@@ -47,6 +48,7 @@ def handle_urls(text: str) -> str:
     text = re.sub(r"http\S+", "", text)
     text = re.sub(r"www\S+", "", text)
     text = re.sub(r"\s+", " ", text)
+    text = re.sub('@[^\s]+', " ", text)
 
     return text.strip()
 
@@ -77,6 +79,7 @@ def clean_text(text: str) -> str:
     
     # normalize text with unicode
     text = unicodedata.normalize("NFKD", text).strip()
+    text = html.unescape(text)
 
     # according to e5 documentation, text used for classificaiton tasks
     # require the "query: " prefix to use an embedding as a feature
