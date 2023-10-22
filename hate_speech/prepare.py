@@ -2,6 +2,12 @@ import pandas as pd
 
 from utils.clean import clean_text
 from utils.embed import embed_text
+from sklearn.preprocessing import StandardScaler
+from imblearn.over_sampling import RandomOverSampler
+
+
+SCALER = StandardScaler()
+ROS = RandomOverSampler()
 
 
 def prepare_dataframe() -> pd.DataFrame:
@@ -25,10 +31,11 @@ def prepare_dataframe() -> pd.DataFrame:
     return df
 
 
-def balance_data():
+def weight_data():
     """
     
     """
+    pass
 
 
 def clean_and_embed(df: pd.DataFrame):
