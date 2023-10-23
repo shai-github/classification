@@ -1,6 +1,7 @@
 import torch.nn.functional as F
 import numpy as np
 
+from typing import Union
 from torch import Tensor
 from transformers import AutoTokenizer, AutoModel
 from sentence_transformers import SentenceTransformer
@@ -53,7 +54,7 @@ def embed_sbert(input_texts: list[str]) -> np.ndarray:
     return embeddings
 
 
-def embed(input_text: list[str], use_sbert: bool = False) -> Tensor | np.ndarray:
+def embed(input_text: list[str], use_sbert: bool = False) -> Union[Tensor, np.ndarray]:
     """
     Embeds input text with the pretrained model
     :param input_text: input text
