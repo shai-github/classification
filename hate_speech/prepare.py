@@ -22,7 +22,7 @@ def prepare_dataframe() -> pd.DataFrame:
     # 0 for neither hate speech nor offensive language
     # 1 for offensive language
     # 2 for hate speech
-    df['class'] = df['class'].apply(lambda x: 0 if x == 2 else 2 if x == 0 else 1)
+    df['class'] = df['class'].apply(lambda x: 0 if x == 2 else 1)
 
     return df
 
@@ -61,14 +61,20 @@ def split_data(df: pd.DataFrame, test_size: float = 0.2) -> dict:
     return {'X_train': X_train, 'X_test': X_test, 'y_train': y_train, 'y_test': y_test}
 
 
-def clean_and_embed(df: pd.DataFrame, convert_to_np: bool = False) -> pd.DataFrame:
+def clean_and_embed(df: pd.DataFrame, sample: int, convert_to_np: bool = False) -> pd.DataFrame:
     """
     Cleans text and embeds it using the pretrained model
     :param df: dataframe with tweets
+    :param sample: number of samples to use
+    :param convert_to_np: whether to convert embeddings to numpy arrays
     :return: dataframe with cleaned tweets and embeddings
     """
     # create a deep copy of the dataframe
-    embed_df = df.copy()
+    # if sample, 
+    if sample:
+        embed_df = df.sample(n=2000) 
+    else:
+        embed_df = df.copy(deep=True)
 
     # clean text and embed it
     embed_df['clean_tweet'] = embed_df['tweet'].apply(clean_text)
