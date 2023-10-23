@@ -6,11 +6,14 @@ from utils.embed import embed
 from sklearn.model_selection import train_test_split
 
 
-def prepare_dataframe() -> pd.DataFrame:
+def prepare_dataframe(make_binary: bool = False) -> pd.DataFrame:
     """
     Read data from csv file and prepare a dataframe with
         Before running, make sure that data is correctly placed
         in the data folder as `hate_speech/data/hsol.csv`
+    :param make_binary: whether to make the labels binary
+        This means hate speech and offensive language are
+        combined into one class for binary classification
     :return: dataframe with adjusted columns and labels
     """
     df = pd.read_csv('hate_speech/data/hsol.csv')
@@ -22,7 +25,10 @@ def prepare_dataframe() -> pd.DataFrame:
     # 0 for neither hate speech nor offensive language
     # 1 for offensive language
     # 2 for hate speech
-    df['class'] = df['class'].apply(lambda x: 0 if x == 2 else 1)
+    if make_binary:
+        df['class'] = df['class'].apply(lambda x: 0 if x == 2 else 1)
+    else:
+        df['class'] = df['class'].apply(lambda x: 0 if x == 2 else 2 if x == 0 else 1)
 
     return df
 
@@ -83,5 +89,9 @@ def clean_and_embed(df: pd.DataFrame, sample: int = 0, use_sbert: bool = False, 
     # convert the tensor embeddings to numpy arrays
     if convert_to_np:
         embed_df['embeddings'] = embed_df['embeddings'].apply(lambda x: x.detach().numpy())
+    
+    # if using SBERT, reshape the embeddings to be 2D arrays
+    if use_sbert:
+        embed_df['embeddings'] = embed_df['embeddings'].apply(lambda x: x.reshape(1, -1))
 
     return embed_df
