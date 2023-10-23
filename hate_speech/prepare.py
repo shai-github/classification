@@ -52,8 +52,8 @@ def split_data(df: pd.DataFrame, test_size: float = 0.2) -> dict:
     :return: dictionary with train and test sets
     """
     X_train, X_test, y_train, y_test = train_test_split(
-        df['embeddings'], 
-        df['class'], 
+        df['embeddings'].to_list(), 
+        df['class'].to_list(), 
         test_size=test_size, 
         random_state=42
     )
@@ -61,17 +61,22 @@ def split_data(df: pd.DataFrame, test_size: float = 0.2) -> dict:
     return {'X_train': X_train, 'X_test': X_test, 'y_train': y_train, 'y_test': y_test}
 
 
-def clean_and_embed(df: pd.DataFrame):
+def clean_and_embed(df: pd.DataFrame, convert_to_np: bool = False) -> pd.DataFrame:
     """
     Cleans text and embeds it using the pretrained model
     :param df: dataframe with tweets
     :return: dataframe with cleaned tweets and embeddings
     """
     # create a deep copy of the dataframe
-    embed_df = df.head().copy()
+    embed_df = df.head(1000).copy()
 
     # clean text and embed it
     embed_df['clean_tweet'] = embed_df['tweet'].apply(clean_text)
     embed_df['embeddings'] = embed_df['clean_tweet'].apply(embed_text)
+
+    # if using a method that requires numpy arrays
+    # convert the tensor embeddings to numpy arrays
+    if convert_to_np:
+        embed_df['embeddings'] = embed_df['embeddings'].apply(lambda x: x.detach().numpy())
 
     return embed_df
