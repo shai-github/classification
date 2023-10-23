@@ -11,7 +11,7 @@ PRETRAINED_TF = 'intfloat/e5-small-v2'
 TOKENIZER = AutoTokenizer.from_pretrained(PRETRAINED_TF)
 MODEL = AutoModel.from_pretrained(PRETRAINED_TF)
 
-PRETRAINED_SBERT = 'sentence-transformers/all-mpnet-base-v2'
+PRETRAINED_SBERT = 'sentence-transformers/all-MiniLM-L12-v2'
 SBERT_EMBEDDER = SentenceTransformer(PRETRAINED_SBERT)
 
 
