@@ -89,9 +89,5 @@ def clean_and_embed(df: pd.DataFrame, sample: int = 0, use_sbert: bool = False, 
     # convert the tensor embeddings to numpy arrays
     if convert_to_np:
         embed_df['embeddings'] = embed_df['embeddings'].apply(lambda x: x.detach().numpy())
-    
-    # if using SBERT, reshape the embeddings to be 2D arrays
-    if use_sbert:
-        embed_df['embeddings'] = embed_df['embeddings'].apply(lambda x: x.reshape(1, -1))
 
     return embed_df

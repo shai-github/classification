@@ -51,7 +51,7 @@ def embed_sbert(input_texts: list[str]) -> np.ndarray:
         show_progress_bar=False
     )
 
-    return embeddings[0]
+    return embeddings
 
 
 def embed(input_text: list[str], use_sbert: bool = False) -> Union[Tensor, np.ndarray]:
