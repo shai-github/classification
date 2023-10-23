@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 
-from utils.clean import clean_text
-from utils.embed import embed_text
+from utils.clean import clean
+from utils.embed import embed
 from sklearn.model_selection import train_test_split
 
 
@@ -61,7 +61,7 @@ def split_data(df: pd.DataFrame, test_size: float = 0.2) -> dict:
     return {'X_train': X_train, 'X_test': X_test, 'y_train': y_train, 'y_test': y_test}
 
 
-def clean_and_embed(df: pd.DataFrame, sample: int, convert_to_np: bool = False) -> pd.DataFrame:
+def clean_and_embed(df: pd.DataFrame, sample: int = 0, use_sbert: bool = False, convert_to_np: bool = False) -> pd.DataFrame:
     """
     Cleans text and embeds it using the pretrained model
     :param df: dataframe with tweets
@@ -70,15 +70,14 @@ def clean_and_embed(df: pd.DataFrame, sample: int, convert_to_np: bool = False) 
     :return: dataframe with cleaned tweets and embeddings
     """
     # create a deep copy of the dataframe
-    # if sample, 
-    if sample:
-        embed_df = df.sample(n=2000) 
+    if sample > 0:
+        embed_df = df.sample(n=sample, random_state=42).copy(deep=True) 
     else:
         embed_df = df.copy(deep=True)
 
     # clean text and embed it
-    embed_df['clean_tweet'] = embed_df['tweet'].apply(clean_text)
-    embed_df['embeddings'] = embed_df['clean_tweet'].apply(embed_text)
+    embed_df['clean_tweet'] = embed_df['tweet'].apply(clean)
+    embed_df['embeddings'] = embed_df['clean_tweet'].apply(embed, use_sbert=use_sbert)
 
     # if using a method that requires numpy arrays
     # convert the tensor embeddings to numpy arrays
