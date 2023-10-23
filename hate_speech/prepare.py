@@ -68,7 +68,7 @@ def clean_and_embed(df: pd.DataFrame, convert_to_np: bool = False) -> pd.DataFra
     :return: dataframe with cleaned tweets and embeddings
     """
     # create a deep copy of the dataframe
-    embed_df = df.head(1000).copy()
+    embed_df = df.copy()
 
     # clean text and embed it
     embed_df['clean_tweet'] = embed_df['tweet'].apply(clean_text)
