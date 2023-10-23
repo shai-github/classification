@@ -29,5 +29,6 @@ def embed_text(input_texts: list[str]) -> Tensor:
     batch_dict = TOKENIZER(input_texts, max_length=512, padding=True, truncation=True, return_tensors='pt')
     outputs = MODEL(**batch_dict)
     embeddings = average_pool(outputs.last_hidden_state, batch_dict['attention_mask'])
+    embeddings = F.normalize(embeddings, p=2, dim=1)
 
-    return F.normalize(embeddings, p=2, dim=1)
+    return embeddings[0]
