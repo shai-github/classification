@@ -41,12 +41,12 @@ def weight_data(df: pd.DataFrame) -> dict:
     :param df: dataframe with labels
     :return: dictionary with weights for each class
     """
-    n_count, o_count, h_count = np.bincount(df['class'])
-    total = n_count + o_count + h_count
+    count_list = [count for count in np.bincount(df['class'])]
+    total = sum(count_list)
 
     return {
-        i: (1 / count_type) * (total) / 3.0 
-        for i, count_type in enumerate([n_count, o_count, h_count])
+        i: (1 / count_type) * (total) / len(count_list) 
+        for i, count_type in enumerate(count_list)
     }
 
 
