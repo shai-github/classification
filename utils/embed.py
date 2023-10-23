@@ -1,12 +1,17 @@
 import torch.nn.functional as F
+import numpy as np
 
 from torch import Tensor
 from transformers import AutoTokenizer, AutoModel
+from sentence_transformers import SentenceTransformer
 
 
-PRETRAINED_MODEL = 'intfloat/e5-small-v2'
-TOKENIZER = AutoTokenizer.from_pretrained(PRETRAINED_MODEL)
-MODEL = AutoModel.from_pretrained(PRETRAINED_MODEL)
+PRETRAINED_TF = 'intfloat/e5-small-v2'
+TOKENIZER = AutoTokenizer.from_pretrained(PRETRAINED_TF)
+MODEL = AutoModel.from_pretrained(PRETRAINED_TF)
+
+PRETRAINED_SBERT = 'sentence-transformers/all-mpnet-base-v2'
+SBERT_EMBEDDER = SentenceTransformer(PRETRAINED_SBERT)
 
 
 def average_pool(last_hidden_states: Tensor, attention_mask: Tensor) -> Tensor:
@@ -20,11 +25,11 @@ def average_pool(last_hidden_states: Tensor, attention_mask: Tensor) -> Tensor:
     return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
 
 
-def embed_text(input_texts: list[str]) -> Tensor:
+def embed_tf(input_texts: list[str]) -> Tensor:
     """
-    Generate batched embeddings from input texts using the pretrained model
+    Generate embeddings from input texts using the pretrained model
     :param input_texts: list of input texts
-    :return: batch normalized embeddings
+    :return: normalized text embeddings
     """
     batch_dict = TOKENIZER(input_texts, max_length=512, padding=True, truncation=True, return_tensors='pt')
     outputs = MODEL(**batch_dict)
@@ -32,3 +37,31 @@ def embed_text(input_texts: list[str]) -> Tensor:
     embeddings = F.normalize(embeddings, p=2, dim=1)
 
     return embeddings[0]
+
+
+def embed_sbert(input_texts: list[str]) -> np.ndarray:
+    """
+    Generates embedding using the SBERT model
+    :param input_texts: list of input texts
+    :return: text embeddings
+    """
+    embeddings = SBERT_EMBEDDER.encode(
+        input_texts,
+        show_progress_bar=False
+    )
+
+    return embeddings
+
+
+def embed(input_text: list[str], use_sbert: bool = False) -> Tensor | np.ndarray:
+    """
+    Embeds input text with the pretrained model
+    :param input_text: input text
+    :param use_sbert: whether to use SBERT or TF
+    :return: text embeddings
+    """
+    if use_sbert:
+        return embed_sbert(input_text)
+    else:
+        return embed_tf(input_text)
+    
