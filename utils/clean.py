@@ -49,6 +49,7 @@ def handle_urls(text: str) -> str:
     text = re.sub(r"www\S+", "", text)
     text = re.sub(r"\s+", " ", text)
     text = re.sub('@[^\s]+', " ", text)
+    text = text.replace("RT", "").replace("rt", "")
 
     return text.strip()
 
