@@ -50,6 +50,24 @@ def weight_data(df: pd.DataFrame) -> dict:
     }
 
 
+def balance_by_count(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Balances the dataframe by sampling the same number of samples
+        from each class
+    :param df: input dataframe
+    :return: balanced dataframe
+    """
+    df_list = []
+    min_count = min(np.bincount(df['class']))
+
+    for i in range(3):
+        df_list.append(
+            df[df['class'] == i].sample(n=min_count, replace=False)
+        )
+
+    return pd.concat(df_list)
+
+
 def split_data(df: pd.DataFrame, test_size: float = 0.2) -> dict:
     """
     Splits the dataframe into train and test sets
@@ -67,7 +85,7 @@ def split_data(df: pd.DataFrame, test_size: float = 0.2) -> dict:
     return {'X_train': X_train, 'X_test': X_test, 'y_train': y_train, 'y_test': y_test}
 
 
-def clean_and_embed(df: pd.DataFrame, sample: int = 0, use_sbert: bool = False, convert_to_np: bool = False) -> pd.DataFrame:
+def clean_and_embed(df: pd.DataFrame, sample: int = 0) -> pd.DataFrame:
     """
     Cleans text and embeds it using the pretrained model
     :param df: dataframe with tweets
@@ -83,11 +101,6 @@ def clean_and_embed(df: pd.DataFrame, sample: int = 0, use_sbert: bool = False, 
 
     # clean text and embed it
     embed_df['clean_tweet'] = embed_df['tweet'].apply(clean)
-    embed_df['embeddings'] = embed_df['clean_tweet'].apply(embed, use_sbert=use_sbert)
-
-    # if using a method that requires numpy arrays
-    # convert the tensor embeddings to numpy arrays
-    if convert_to_np:
-        embed_df['embeddings'] = embed_df['embeddings'].apply(lambda x: x.detach().numpy())
+    embed_df['embeddings'] = embed_df['clean_tweet'].apply(embed)
 
     return embed_df
