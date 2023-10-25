@@ -1,7 +1,7 @@
-from transformers import AutoModelForSequenceClassification
-from transformers import TFAutoModelForSequenceClassification
-from transformers import AutoTokenizer, AutoConfig
 import numpy as np
+
+from transformers import AutoModelForSequenceClassification
+from transformers import AutoTokenizer, AutoConfig
 from scipy.special import softmax
 
 
@@ -13,6 +13,9 @@ MODEL = AutoModelForSequenceClassification.from_pretrained(PRETRAINED_MODEL)
 
 def preprocess_tweet(text:str) -> str:
     """
+    Preprocesses the text by removing mentions and urls
+    :param text: tweet text
+    :return: preprocessed tweet text
     """
     new_text = []
     for t in text.split(" "):
@@ -23,8 +26,11 @@ def preprocess_tweet(text:str) -> str:
     return " ".join(new_text)
 
 
-def get_sentiment(text: str, use_tf: bool=False) -> str:
+def get_sentiment(text: str) -> list:
     """
+    Retrieves the sentiment score for a given tweet text
+    :param text: tweet text
+    :return: list of sentiment scores
     """
     text = preprocess_tweet(text)
     encoded_input = TOKENIZER(text, return_tensors='pt')
