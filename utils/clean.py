@@ -7,6 +7,7 @@ import contractions
 from typing import List, Union, Iterable
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
+from utils.constants import FOR_REMOVAL
 
 TOKENIZER = RegexpTokenizer(r'\w+')
 LEMMATIZER = WordNetLemmatizer()
@@ -46,9 +47,10 @@ def _lemmatize_tokens(tokens: List[str]) -> Iterable[str]:
     Generator that yields valid lemmatized tokens
     """
     for token in tokens:
-        lemma_token = re.sub('[0-9]', '', LEMMATIZER.lemmatize(token))
-        if _good_token(lemma_token):
-            yield lemma_token
+        if token not in FOR_REMOVAL:
+            lemma_token = re.sub('[0-9]', '', LEMMATIZER.lemmatize(token))
+            if _good_token(lemma_token):
+                yield lemma_token
 
 
 def tokenize_text(text: str):
@@ -123,7 +125,6 @@ def handle_urls(text: str) -> str:
     text = re.sub(r"www\S+", "", text)
     text = re.sub(r"\s+", " ", text)
     text = re.sub('@[^\s]+', " ", text)
-    text = text.replace("RT", "").replace("rt", "")
 
     return text.strip()
 
