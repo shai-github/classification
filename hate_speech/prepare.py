@@ -3,7 +3,10 @@ import numpy as np
 
 from utils.clean import clean
 from utils.embed import embed
+from hate_speech.sentiment import get_sentiment
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from imblearn.over_sampling import RandomOverSampler
 
 
 def prepare_dataframe(make_binary: bool = False) -> pd.DataFrame:
@@ -68,24 +71,41 @@ def balance_by_count(df: pd.DataFrame) -> pd.DataFrame:
     return pd.concat(df_list)
 
 
-def split_data(df: pd.DataFrame, test_size: float = 0.2) -> dict:
+def merge_sentiment(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Merges the sentiment scores with the dataframe
+    :param df: dataframe with embeddings
+    :return: dataframe with sentiment scores and embeddings
+    """    
+    scale_df = pd.DataFrame()
+    scale_df['embeddings'] = df['sentiment'].apply(lambda x: x.tolist()) + df['embeddings'].apply(lambda x: x.tolist())
+    scale_df['class'] = df['class']
+
+    return scale_df
+
+
+def split_data(df: pd.DataFrame, use_sentiment: bool = False) -> dict:
     """
     Splits the dataframe into train and test sets
     :param df: dataframe with tweets and labels
-    :param test_size: size of the test set
     :return: dictionary with train and test sets
     """
+    if use_sentiment:
+        scale_df = merge_sentiment(df)
+    else:
+        scale_df = df.copy(deep=True)
+
     X_train, X_test, y_train, y_test = train_test_split(
-        df['embeddings'].to_list(), 
-        df['class'].to_list(), 
-        test_size=test_size, 
+        scale_df['embeddings'].to_list(), 
+        scale_df['class'].to_list(), 
+        test_size=0.2, 
         random_state=42
     )
     
     return {'X_train': X_train, 'X_test': X_test, 'y_train': y_train, 'y_test': y_test}
 
 
-def clean_and_embed(df: pd.DataFrame, sample: int = 0) -> pd.DataFrame:
+def clean_and_embed(df: pd.DataFrame, sample: int = 0, include_sentiment: bool = False) -> pd.DataFrame:
     """
     Cleans text and embeds it using the pretrained model
     :param df: dataframe with tweets
@@ -102,5 +122,8 @@ def clean_and_embed(df: pd.DataFrame, sample: int = 0) -> pd.DataFrame:
     # clean text and embed it
     embed_df['clean_tweet'] = embed_df['tweet'].apply(clean)
     embed_df['embeddings'] = embed_df['clean_tweet'].apply(embed)
+
+    if include_sentiment:
+        embed_df['sentiment'] = embed_df['tweet'].apply(get_sentiment)
 
     return embed_df
