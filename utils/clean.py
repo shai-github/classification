@@ -9,6 +9,7 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
 from utils.constants import FOR_REMOVAL
 
+
 TOKENIZER = RegexpTokenizer(r'\w+')
 LEMMATIZER = WordNetLemmatizer()
 
@@ -67,9 +68,11 @@ def tokenize_text(text: str):
     token_text = re.sub('\n', '', token_text)
     token_text = re.sub('\w*\d\w*', '', token_text)
     no_contractions = contractions.fix(token_text)
-    
-    return TOKENIZER.tokenize(no_contractions)
 
+    tokens = TOKENIZER.tokenize(no_contractions)
+
+    return [token for token in tokens if token not in FOR_REMOVAL]
+    
 
 def lemmatize_tokens(text: str):
     """
@@ -172,12 +175,6 @@ def clean(text: str) -> str:
     text = unicodedata.normalize("NFKD", text).strip()
     text = html.unescape(text)
 
-    # remove punctuation noise
-    text = remove_punct_noise(text)
-
-    # generate lemma
-    text = " ".join(generate_lemma(text))
-
-    # according to e5 documentation, text used for classificaiton tasks
+    # according to e5 documentation, text used for classification tasks
     # require the "query: " prefix to use an embedding as a feature
     return f"query: {text}"
