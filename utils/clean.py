@@ -2,13 +2,6 @@ import re
 import html
 import unicodedata
 
-from nltk.tokenize import TweetTokenizer
-
-
-FOR_REMOVAL = [
-    "rt", "yoooooouuuu", "yoooo", "yooo", "loool", "lmfaoooo", "yoooooooooooooo", "lmfaoooooooo", "squaaaaad", "yoooo", "yoooou",
-    "ah", ""
-]
 
 HTML = re.compile(r"<[^>]*>")
 HASHTAG = re.compile(r"#(\w+)")
@@ -60,16 +53,6 @@ def handle_urls(text: str) -> str:
     return text.strip()
 
 
-def handle_removal_terms(text):
-    """
-    Method to remove terms from text
-    :param text: a piece of text
-    :return: text with terms removed
-    """
-    tokens = TweetTokenizer().tokenize(text.lower())
-    return " ".join([token for token in tokens if token not in FOR_REMOVAL])
-
-
 def clean(text: str) -> str:
     """
     Clean text by removing URLs, HTML tags, line breaks, tabs,  and extra whitespace
@@ -97,9 +80,6 @@ def clean(text: str) -> str:
     # normalize text with unicode
     text = unicodedata.normalize("NFKD", text).strip()
     text = html.unescape(text)
-
-    # tokenize and remove stopwords
-    text = handle_removal_terms(text)
 
     # according to e5 documentation, text used for classification tasks
     # require the "query: " prefix to use an embedding as a feature
