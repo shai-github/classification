@@ -1,17 +1,7 @@
 import re
 import html
-import string
 import unicodedata
-import contractions
 
-from typing import List, Union, Iterable
-from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.tokenize import RegexpTokenizer
-from utils.constants import FOR_REMOVAL
-
-
-TOKENIZER = RegexpTokenizer(r'\w+')
-LEMMATIZER = WordNetLemmatizer()
 
 HTML = re.compile(r"<[^>]*>")
 HASHTAG = re.compile(r"#(\w+)")
@@ -29,75 +19,6 @@ EMOJIS = re.compile("["
 
 class NoText(Exception):
     """Error raised if text is empty or null"""
-
-
-def _good_token(token: str) -> bool:
-    """
-    Returns False if a token is invalid, returns True otherwise
-    """
-    if (not token) or (token == "") or (len(token) <= 1):
-        return False
-    if ("html" in token ) or ("http" in token) or ("meta" in token):
-        return False
-    
-    return True
-
-
-def _lemmatize_tokens(tokens: List[str]) -> Iterable[str]:
-    """
-    Generator that yields valid lemmatized tokens
-    """
-    for token in tokens:
-        if token not in FOR_REMOVAL:
-            lemma_token = re.sub('[0-9]', '', LEMMATIZER.lemmatize(token))
-            if _good_token(lemma_token):
-                yield lemma_token
-
-
-def tokenize_text(text: str):
-    """
-    Tokenizes text based on RegexpTokenizer
-    :param text: input sting
-    :return: tokenized list of text
-    """
-    token_text = str(text).lower()
-    token_text = re.sub('\[.*?\]', '', token_text)
-    token_text = re.sub('https?://\S+|www\.\S+', '', token_text)
-    token_text = re.sub('<.*?>+', '', token_text)
-    token_text = re.sub('[%s]' % re.escape(string.punctuation), ' ', token_text)
-    token_text = re.sub('\n', '', token_text)
-    token_text = re.sub('\w*\d\w*', '', token_text)
-    no_contractions = contractions.fix(token_text)
-
-    tokens = TOKENIZER.tokenize(no_contractions)
-
-    return [token for token in tokens if token not in FOR_REMOVAL]
-    
-
-def lemmatize_tokens(text: str):
-    """
-    Performs lemmatization using WordNetLemmatizer and conducts additional cleaning checks for tokenized text
-    :param text: input string
-    :return: lemmatized list of text
-    """
-    return list(_lemmatize_tokens(tokenize_text(text)))
-
-
-def generate_lemma(texts: Union[List[str], str]):
-    """
-    Reduce the inflectional forms of each word in a text into a common base or root with lemmatization
-    Enforces an is_ascii filter which means all tokens that are not strictly ascii will be cleaned out
-    :param texts: <List [str] or str> List of texts, or single text
-    :return: <Union[List[List[str], List[str]]>  list of lists of base words for each text or lists of texts
-    """
-    if isinstance(texts, list):
-        clean_toks = [lemmatize_tokens(doc) for doc in texts]
-        return clean_toks
-    elif isinstance(texts, str):
-        clean_toks = lemmatize_tokens(texts)
-        return clean_toks
-    else:
-        TypeError(f"type: {type(texts)} is not supported use either list or str")
 
 
 def hashtag_to_words(text: str) -> str:
@@ -130,21 +51,6 @@ def handle_urls(text: str) -> str:
     text = re.sub('@[^\s]+', " ", text)
 
     return text.strip()
-
-
-def remove_punct_noise(text: str) -> str:
-    """
-    Method to remove punctuation noise
-    :param text: a piece of text
-    :return: text with punctuation noise removed
-    """
-    text = text.replace('"', '')
-    text = text.replace("'", '')
-    text = text.replace("!", '')
-    text = text.replace("`", '')
-    text = text.replace("..", '')
-
-    return text
 
 
 def clean(text: str) -> str:
