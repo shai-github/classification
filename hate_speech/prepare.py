@@ -5,8 +5,6 @@ from utils.clean import clean
 from utils.embed import embed
 from hate_speech.sentiment import get_sentiment
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from imblearn.over_sampling import RandomOverSampler
 
 
 def prepare_dataframe(make_binary: bool = False) -> pd.DataFrame:
